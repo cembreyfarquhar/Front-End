@@ -1,12 +1,22 @@
 import React, { useState } from "react";
 
-function SignIn() {
+import axios from "axios";
+
+const baseUrl = process.env.REACT_APP_BACKEND;
+
+function SignIn({ history }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
   return (
     <>
       <h2>Welcome back. Log in below</h2>
-      <form>
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          logIn();
+        }}
+      >
         <input
           type="text"
           value={username}
@@ -17,12 +27,36 @@ function SignIn() {
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
+        <button>Sign In</button>
       </form>
-      <h3>
-        Don't have an account? Click <button>here</button> to sign up
-      </h3>
     </>
   );
+
+  function logIn() {
+    axios
+      .post(`${baseUrl}/api/auth/login`, {
+        username,
+        password
+      })
+      .then(res => {
+        console.log(res.data);
+        localStorage.setItem("token", res.data.token);
+        window.location.reload(false);
+      })
+      .catch(console.error);
+  }
+
+  function register() {
+    axios
+      .post(`${baseUrl}/api/auth/register`, {
+        username,
+        password
+      })
+      .then(res => {
+        console.log(res.data);
+      })
+      .catch(console.error);
+  }
 }
 
 export default SignIn;
